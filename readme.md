@@ -44,11 +44,50 @@ Este proyecto es una API escrita en Rust que ejecuta procedimientos almacenados 
 
    Donde `nombre_del_sp` es el nombre del procedimiento almacenado que deseas ejecutar.
 
-## Ejemplos
+## Arbol de carpetas
 
-### Ejecución de un SP sin parámetros
 
-Accediendo a la siguiente URL:
+## Descripción de Archivos y Directorios
+
+- **src/**
+  - Contiene el código fuente principal del proyecto.
+
+- **main.rs**
+  - Archivo de entrada principal de la aplicación.
+
+- **config/**
+  - Directorio para la configuración de la aplicación.
+  
+  - **mod.rs**
+    - Módulo principal de configuración.
+
+  - **database.rs**
+    - Inicialización y configuración de la base de datos.
+
+- **routes/**
+  - Directorio para las rutas de la API.
+
+  - **mod.rs**
+    - Módulo principal de rutas.
+
+  - **database.rs**
+    - Rutas relacionadas con la base de datos.
+
+  - **stored_procedure.rs**
+    - Rutas relacionadas con la ejecución de procedimientos almacenados.
+
+- **models/**
+  - Directorio para los modelos de datos utilizados en la aplicación.
+
+  - **mod.rs**
+    - Módulo principal de modelos.
+
+  - **response.rs**
+    - Estructuras de respuesta utilizadas en la API.
+
+Esta estructura de directorios facilita la organización y la escalabilidad del proyecto, permitiendo un mantenimiento más sencillo y una mejor separación de preocupaciones.
+
+
 
 ## TODO
 
