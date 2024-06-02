@@ -21,7 +21,7 @@ Este proyecto es una API escrita en Rust que ejecuta procedimientos almacenados 
 
 1. Clona el repositorio:
     ```sh
-    git clone https://github.com/tu_usuario/rust-sql-server-api.git
+    git clone https://github.com/karmoybt/sp_executor.git
     cd rust-sql-server-api
     ```
 
@@ -49,6 +49,14 @@ Este proyecto es una API escrita en Rust que ejecuta procedimientos almacenados 
 ### Ejecución de un SP sin parámetros
 
 Accediendo a la siguiente URL:
+
+##TODO
+
+- SP, con parámetros, pasar un JSON para ejecutar los parámetros
+- Autenticación, middleware, algún sistema de autenticación de usuarios y contraseñas activos
+- GitHub Action
+  - Para los test
+  - Para publicar los exe
 
 ## Contribución
 
