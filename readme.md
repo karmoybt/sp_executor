@@ -46,8 +46,21 @@ Este proyecto es una API escrita en Rust que ejecuta procedimientos almacenados 
 
 ## Arbol de carpetas
 
+    rust-sql-server-api/
+    ├── src/
+    │ ├── main.rs # Punto de entrada principal
+    │ ├── config/
+    │ │ ├── mod.rs # Módulo de configuración
+    │ │ └── database.rs # Inicialización y configuración de la base de datos
+    │ ├── routes/
+    │ │ ├── mod.rs # Módulo de rutas
+    │ │ ├── database.rs # Rutas relacionadas con la base de datos
+    │ │ └── stored_procedure.rs # Rutas relacionadas con procedimientos almacenados
+    │ └── models/
+    │ ├── mod.rs # Módulo de modelos
+    │ └── response.rs # Estructuras de respuesta
 
-## Descripción de Archivos y Directorios
+### Descripción de Archivos y Directorios
 
 - **src/**
   - Contiene el código fuente principal del proyecto.
@@ -84,9 +97,6 @@ Este proyecto es una API escrita en Rust que ejecuta procedimientos almacenados 
 
   - **response.rs**
     - Estructuras de respuesta utilizadas en la API.
-
-Esta estructura de directorios facilita la organización y la escalabilidad del proyecto, permitiendo un mantenimiento más sencillo y una mejor separación de preocupaciones.
-
 
 
 ## TODO
