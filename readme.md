@@ -57,6 +57,9 @@ Accediendo a la siguiente URL:
 - GitHub Action
   - Para los test
   - Para publicar los exe
+- "Sistema" para mapear el sp con el front
+- Gestionar la bbdd , crear tablas sin/con relaciones, sp (basicos)
+- Añadir mas BBDD (ClickHouse, Postgress) 
 
 ## Contribución
 
