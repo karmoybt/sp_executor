@@ -25,8 +25,9 @@ async fn call_stored_procedure(sp_name: String, params: JsonValue, rb: Arc<RBati
 
     match params {
         JsonValue::Object(ref map) => {
+            let mut first = true;
             for (k, v) in map.iter() {
-                let k_str = k.to_string();  // Directly convert key to string
+                let k_str = k.to_string();
                 let param = match json_to_rbs_value(&v) {
                     Ok(val) => val,
                     Err(e) => {
@@ -38,10 +39,13 @@ async fn call_stored_procedure(sp_name: String, params: JsonValue, rb: Arc<RBati
                         }));
                     }
                 };
-                if !sql.is_empty() {
+                if !first {
                     sql.push_str(", ");
+                } else {
+                    sql.push_str(" ");
                 }
-                sql.push_str(&format!("@{}", k_str));
+                first = false;
+                sql.push_str(&format!("@{} = ?", k_str));
                 rbs_params.push(param);
             }
         }
