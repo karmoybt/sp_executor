@@ -1836,6 +1836,7 @@ name = "sp_executor"
 version = "0.1.0"
 dependencies = [
  "dotenv",
+ "indexmap",
  "native-tls",
  "rbatis",
  "rbdc",
