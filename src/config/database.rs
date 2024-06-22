@@ -2,7 +2,6 @@ use rbatis::{rbatis::RBatis, DefaultPool};
 use rbdc_mssql::{tiberius::Config, MssqlConnectOptions, MssqlDriver};
 use std::env;
 
-
 pub async fn init_db() -> RBatis {
     let rb = RBatis::new();
     let db_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set");

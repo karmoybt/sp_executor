@@ -4,6 +4,7 @@ use std::sync::Arc;
 mod config;
 mod routes;
 mod models;
+mod auth;
 
 #[tokio::main]
 async fn main() {
@@ -13,8 +14,9 @@ async fn main() {
 
     let db_route = routes::database::db_route(rb.clone());
     let sp_route = routes::stored_procedure::sp_route(rb.clone());
+    let auth_routes = routes::auth_routes::auth_routes();
 
-    let routes = db_route.or(sp_route);
+    let routes = auth_routes.or(db_route).or(sp_route);
 
     let server_addr = config::server::get_server_addr();
 

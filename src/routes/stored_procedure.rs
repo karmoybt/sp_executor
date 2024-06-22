@@ -1,6 +1,9 @@
+use crate::auth::validate_jwt;
+use crate::auth::auth::CustomError;
+use crate::models::response::Response;
+
 use warp::Filter;
 use serde_json::Value as JsonValue;
-use crate::models::response::Response;
 use std::sync::Arc;
 use std::convert::Infallible;
 use indexmap::IndexMap;
@@ -8,15 +11,25 @@ use rbs::value::map::ValueMap;
 use rbs::Value as RbsValue;
 use rbatis::rbatis::RBatis;
 
+
 pub fn sp_route(rb: Arc<RBatis>) -> impl Filter<Extract = impl warp::Reply, Error = warp::Rejection> + Clone {
     warp::path!("SP" / String)
         .and(warp::post())
+        .and(warp::header::<String>("authorization"))
         .and(warp::body::json())
         .and(warp::any().map(move || Arc::clone(&rb)))
         .and_then(call_stored_procedure)
 }
 
-async fn call_stored_procedure(sp_name: String, params: JsonValue, rb: Arc<RBatis>) -> Result<impl warp::Reply, Infallible> {
+async fn call_stored_procedure(sp_name: String, token: String, params: JsonValue, rb: Arc<RBatis>) -> Result<impl warp::Reply, Infallible> {
+    if let Err(e) = validate_jwt(&token) {
+        return Ok(warp::reply::json(&Response {
+            data: RbsValue::Null.into(),
+            status: "error".to_string(),
+            message: format!("Invalid token: {:?}", e),
+        }));
+    }
+
     let mut sql = format!("EXEC {}", sp_name);
     let mut rbs_params = vec![];
 
@@ -31,7 +44,7 @@ async fn call_stored_procedure(sp_name: String, params: JsonValue, rb: Arc<RBati
                 let param = match json_to_rbs_value(&v) {
                     Ok(val) => val,
                     Err(e) => {
-                        eprintln!("Failed to convert param {} to rbs::Value: {:?}", k_str, e);
+                        eprintln!("Fallo al convertir el parametro {} to rbs::Value: {:?}", k_str, e);
                         return Ok(warp::reply::json(&Response {
                             data: RbsValue::Null.into(),
                             status: "error".to_string(),
@@ -50,11 +63,11 @@ async fn call_stored_procedure(sp_name: String, params: JsonValue, rb: Arc<RBati
             }
         }
         _ => {
-            eprintln!("Invalid parameters: {:?}", params);
+            eprintln!("Parametro Invalido: {:?}", params);
             return Ok(warp::reply::json(&Response {
                 data: RbsValue::Null.into(),
                 status: "error".to_string(),
-                message: "Invalid parameters".to_string(),
+                message: "Parametro Invalido: ".to_string(),
             }));
         }
     }
@@ -68,7 +81,7 @@ async fn call_stored_procedure(sp_name: String, params: JsonValue, rb: Arc<RBati
             }))
         }
         Err(e) => {
-            eprintln!("Stored procedure {} failed: {:?}", sp_name, e);
+            eprintln!("Stored procedure {} Ha fallado: {:?}", sp_name, e);
             Ok(warp::reply::json(&Response {
                 data: RbsValue::Null.into(),
                 status: "error".to_string(),
@@ -90,7 +103,7 @@ fn json_to_rbs_value(value: &JsonValue) -> Result<RbsValue, String> {
             } else if let Some(f) = num.as_f64() {
                 Ok(RbsValue::F64(f))
             } else {
-                Err("Unsupported number type".to_string())
+                Err("Error numero no soportado".to_string())
             }
         }
         JsonValue::String(s) => Ok(RbsValue::String(s.clone())),

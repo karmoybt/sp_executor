@@ -101,7 +101,7 @@ Este proyecto es una API escrita en Rust que ejecuta procedimientos almacenados 
 
 ## TODO
 
-- SP, con parámetros, pasar un JSON para ejecutar los parámetros
+- ~~SP, con parámetros, pasar un JSON para ejecutar los parámetros
 - Autenticación, middleware, algún sistema de autenticación de usuarios y contraseñas activos
 - GitHub Action
   - Para los test
