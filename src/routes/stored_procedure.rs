@@ -1,5 +1,4 @@
 use crate::auth::validate_jwt;
-use crate::auth::auth::CustomError;
 use crate::models::response::Response;
 
 use warp::Filter;
@@ -10,7 +9,6 @@ use indexmap::IndexMap;
 use rbs::value::map::ValueMap;
 use rbs::Value as RbsValue;
 use rbatis::rbatis::RBatis;
-
 
 pub fn sp_route(rb: Arc<RBatis>) -> impl Filter<Extract = impl warp::Reply, Error = warp::Rejection> + Clone {
     warp::path!("SP" / String)

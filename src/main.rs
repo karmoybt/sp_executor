@@ -3,8 +3,8 @@ use std::sync::Arc;
 
 mod config;
 mod routes;
-mod models;
 mod auth;
+mod models;
 
 #[tokio::main]
 async fn main() {

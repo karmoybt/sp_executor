@@ -1,12 +1,14 @@
 use warp::Filter;
 use serde::{Deserialize, Serialize};
-use crate::auth::CustomError;
+use crate::auth::auth::CustomError;
 use crate::auth::{create_jwt, validate_jwt};
 
 #[derive(Deserialize)]
+
+#[allow(dead_code)]  // Esto evita la advertencia de campo no leído
 struct LoginRequest {
     username: String,
-    password: String,
+    password: String,  // Marca como _ si no lo necesitas
 }
 
 #[derive(Serialize)]
