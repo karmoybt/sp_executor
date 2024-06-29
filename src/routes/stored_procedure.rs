@@ -28,7 +28,7 @@ async fn call_stored_procedure(sp_name: String, token: String, params: JsonValue
         return Ok(warp::reply::json(&Response {
             data: RbsValue::Null.into(),
             status: "error".to_string(),
-            message: format!("Invalid token: {:?}", e),
+            message: format!("Token Invalido: {:?}", e),
         }));
     }
 
