@@ -2,6 +2,11 @@ use warp::Filter;
 use crate::auth::{create_jwt, validate_jwt};
 use serde::{Deserialize, Serialize};
 use warp::http::StatusCode;
+use jsonwebtoken::{encode, Header};
+use crate::models::user::User;
+use chrono::{Utc, Duration};
+use std::env;
+
 
 #[derive(Deserialize)]
 struct LoginRequest {
@@ -12,6 +17,29 @@ struct LoginRequest {
 #[derive(Serialize)]
 struct LoginResponse {
     token: String,
+}
+
+// Función para generar un token JWT dado un usuario
+pub fn generate_jwt(user: &User) -> Result<String, String> {
+    let expiration = Utc::now().checked_add_signed(Duration::days(1))
+        .expect("valid timestamp")
+        .timestamp();
+
+    let claims = Claims {
+        sub: user.username.clone(),
+        exp: expiration as usize,
+    };
+
+    let secret = env::var("SECRET_KEY").expect("SECRET_KEY must be set");
+    encode(&Header::default(), &claims, &secret.as_ref())
+        .map_err(|e| format!("Error generando token JWT: {:?}", e))
+}
+
+// Función para manejar el proceso de login
+pub fn login(user: &User) -> Result<String, String> {
+    // Aquí deberías verificar las credenciales del usuario
+    // En este ejemplo, simplemente generamos un token JWT
+    generate_jwt(user)
 }
 
 async fn login_handler(login: LoginRequest) -> Result<impl warp::Reply, warp::Rejection> {

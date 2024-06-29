@@ -1,44 +1,40 @@
 use warp::Filter;
+use crate::auth::auth::{create_jwt, validate_jwt, CustomError};
 use serde::{Deserialize, Serialize};
-use crate::auth::auth::CustomError;
-use crate::auth::{create_jwt, validate_jwt};
 
-#[derive(Deserialize)]
-
-#[allow(dead_code)]  // Esto evita la advertencia de campo no leído
+#[derive(Serialize, Deserialize)]
 struct LoginRequest {
     username: String,
-    password: String,  // Marca como _ si no lo necesitas
-}
-
-#[derive(Serialize)]
-struct LoginResponse {
-    token: String,
-}
-
-async fn login_handler(login: LoginRequest) -> Result<impl warp::Reply, warp::Rejection> {
-    // Aquí deberías validar las credenciales del usuario (omitiendo por simplicidad)
-    // Si las credenciales son válidas, crea un JWT
-    let token = create_jwt(&login.username).map_err(|_| warp::reject::custom(CustomError))?;
-
-    Ok(warp::reply::json(&LoginResponse { token }))
-}
-
-async fn protected_handler(token: String) -> Result<impl warp::Reply, warp::Rejection> {
-    validate_jwt(&token).map_err(|_| warp::reject::custom(CustomError))?;
-    Ok(warp::reply::json(&"Protected resource accessed"))
+    password: String,
 }
 
 pub fn auth_routes() -> impl Filter<Extract = impl warp::Reply, Error = warp::Rejection> + Clone {
-    let login = warp::path("login")
+    let login_route = warp::path("login")
         .and(warp::post())
         .and(warp::body::json())
-        .and_then(login_handler);
+        .and_then(handle_login);
 
-    let protected = warp::path("protected")
-        .and(warp::get())
+    let validate_route = warp::path("validate")
         .and(warp::header::<String>("authorization"))
-        .and_then(protected_handler);
+        .and_then(handle_validate);
 
-    login.or(protected)
+    login_route.or(validate_route)
+}
+
+async fn handle_login(body: LoginRequest) -> Result<impl warp::Reply, warp::Rejection> {
+    if body.username == "testuser" && body.password == "testpassword" {
+        match create_jwt(&body.username) {
+            Ok(token) => Ok(warp::reply::json(&token)),
+            Err(_) => Err(warp::reject::custom(CustomError)),
+        }
+    } else {
+        Err(warp::reject::custom(CustomError))
+    }
+}
+
+async fn handle_validate(token: String) -> Result<impl warp::Reply, warp::Rejection> {
+    match validate_jwt(&token) {
+        Ok(claims) => Ok(warp::reply::json(&claims)),
+        Err(_) => Err(warp::reject::custom(CustomError)),
+    }
 }

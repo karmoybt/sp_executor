@@ -1,7 +1,6 @@
+use warp::Filter;
 use crate::auth::validate_jwt;
 use crate::models::response::Response;
-
-use warp::Filter;
 use serde_json::Value as JsonValue;
 use std::sync::Arc;
 use std::convert::Infallible;
@@ -10,7 +9,9 @@ use rbs::value::map::ValueMap;
 use rbs::Value as RbsValue;
 use rbatis::rbatis::RBatis;
 
+/// Definimos la ruta para los procedimientos almacenados.
 pub fn sp_route(rb: Arc<RBatis>) -> impl Filter<Extract = impl warp::Reply, Error = warp::Rejection> + Clone {
+    // Definimos el filtro para la ruta "/SP/{sp_name}" que acepta un POST.
     warp::path!("SP" / String)
         .and(warp::post())
         .and(warp::header::<String>("authorization"))
@@ -19,8 +20,11 @@ pub fn sp_route(rb: Arc<RBatis>) -> impl Filter<Extract = impl warp::Reply, Erro
         .and_then(call_stored_procedure)
 }
 
+/// Función async que maneja la ejecución del procedimiento almacenado.
 async fn call_stored_procedure(sp_name: String, token: String, params: JsonValue, rb: Arc<RBatis>) -> Result<impl warp::Reply, Infallible> {
+    // Validamos el token JWT recibido.
     if let Err(e) = validate_jwt(&token) {
+        // Si hay un error en la validación del token, respondemos con un mensaje de error.
         return Ok(warp::reply::json(&Response {
             data: RbsValue::Null.into(),
             status: "error".to_string(),
@@ -28,12 +32,14 @@ async fn call_stored_procedure(sp_name: String, token: String, params: JsonValue
         }));
     }
 
+    // Construimos la consulta SQL para el procedimiento almacenado.
     let mut sql = format!("EXEC {}", sp_name);
     let mut rbs_params = vec![];
 
-    println!("Sp nombre: {}", sp_name);
+    println!("Nombre del SP: {}", sp_name);
     println!("Parámetros: {:?}", params);
 
+    // Convertimos los parámetros JSON recibidos a tipos de datos compatibles con RBatis.
     match params {
         JsonValue::Object(ref map) => {
             let mut first = true;
@@ -42,7 +48,8 @@ async fn call_stored_procedure(sp_name: String, token: String, params: JsonValue
                 let param = match json_to_rbs_value(&v) {
                     Ok(val) => val,
                     Err(e) => {
-                        eprintln!("Fallo al convertir el parametro {} to rbs::Value: {:?}", k_str, e);
+                        // Manejamos errores en la conversión de parámetros.
+                        eprintln!("Error al convertir el parámetro {} a RbsValue: {:?}", k_str, e);
                         return Ok(warp::reply::json(&Response {
                             data: RbsValue::Null.into(),
                             status: "error".to_string(),
@@ -55,23 +62,26 @@ async fn call_stored_procedure(sp_name: String, token: String, params: JsonValue
                 } else {
                     sql.push_str(" ");
                 }
-                first = false;
                 sql.push_str(&format!("@{} = ?", k_str));
                 rbs_params.push(param);
+                first = false;
             }
         }
         _ => {
-            eprintln!("Parametro Invalido: {:?}", params);
+            // Manejamos casos donde los parámetros no son un objeto JSON válido.
+            eprintln!("Parámetro inválido: {:?}", params);
             return Ok(warp::reply::json(&Response {
                 data: RbsValue::Null.into(),
                 status: "error".to_string(),
-                message: "Parametro Invalido: ".to_string(),
+                message: "Parámetro inválido.".to_string(),
             }));
         }
     }
 
+    // Ejecutamos la consulta contra la base de datos utilizando RBatis.
     match rb.query(&sql, rbs_params).await {
         Ok(rows) => {
+            // Si la ejecución del procedimiento almacenado fue exitosa, respondemos con los datos obtenidos.
             Ok(warp::reply::json(&Response {
                 data: rows.into(),
                 status: "ok".to_string(),
@@ -79,7 +89,8 @@ async fn call_stored_procedure(sp_name: String, token: String, params: JsonValue
             }))
         }
         Err(e) => {
-            eprintln!("Stored procedure {} Ha fallado: {:?}", sp_name, e);
+            // Manejamos errores en la ejecución del procedimiento almacenado.
+            eprintln!("Error al ejecutar el procedimiento almacenado {}: {:?}", sp_name, e);
             Ok(warp::reply::json(&Response {
                 data: RbsValue::Null.into(),
                 status: "error".to_string(),
@@ -89,6 +100,7 @@ async fn call_stored_procedure(sp_name: String, token: String, params: JsonValue
     }
 }
 
+/// Función que convierte un valor JSON en un RbsValue.
 fn json_to_rbs_value(value: &JsonValue) -> Result<RbsValue, String> {
     match value {
         JsonValue::Null => Ok(RbsValue::Null),
@@ -101,7 +113,7 @@ fn json_to_rbs_value(value: &JsonValue) -> Result<RbsValue, String> {
             } else if let Some(f) = num.as_f64() {
                 Ok(RbsValue::F64(f))
             } else {
-                Err("Error numero no soportado".to_string())
+                Err("Error: número no soportado.".to_string())
             }
         }
         JsonValue::String(s) => Ok(RbsValue::String(s.clone())),
