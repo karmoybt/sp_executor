@@ -15,7 +15,7 @@ async fn main() {
 
     // Obtén las rutas desde los módulos correspondientes
     let db_routes = routes::database::db_route(rb.clone());
-    let sp_routes = routes::stored_procedure::sp_route(rb.clone());
+    let sp_routes = routes::stored_procedure::ruta_sp(rb.clone());
     let auth_routes = routes::auth_routes::auth_routes();
 
     // Combina todas las rutas
