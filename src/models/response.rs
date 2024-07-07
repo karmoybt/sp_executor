@@ -3,7 +3,7 @@ use rbs::Value;
 
 #[derive(Serialize)]
 pub struct Response {
-    pub data: Vec<Value>,
-    pub status: String,
-    pub message: String,
+    pub datos: Vec<Value>,
+    pub estado: String,
+    pub mensaje: String,
 }

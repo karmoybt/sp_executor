@@ -6,24 +6,26 @@ mod routes;
 mod models;
 mod auth;
 
+
+
 #[tokio::main]
 async fn main() {
     dotenv::dotenv().ok();
 
     // Inicializa la base de datos y envuélvela en un Arc
-    let rb = Arc::new(config::database::init_db().await);
+    let rb = Arc::new(config::database::inicializar_bd().await);
 
     // Obtén las rutas desde los módulos correspondientes
-    let db_routes = routes::database::db_route(rb.clone());
-    let sp_routes = routes::stored_procedure::ruta_sp(rb.clone());
-    let auth_routes = routes::auth_routes::auth_routes();
+    let rutas_bd =routes::database::ruta_bd(rb.clone());
+    let rutas_sp =routes::stored_procedure::ruta_procedimiento_almacenado(rb.clone());
+    let rutas_autenticacion =routes::auth_routes::rutas_autenticacion();
 
     // Combina todas las rutas
-    let routes = db_routes.or(sp_routes).or(auth_routes);
+    let rutas = rutas_bd.or(rutas_sp).or(rutas_autenticacion);
 
-    // Obtiene la dirección del servidor desde config::server
-    let server_addr = config::server::get_server_addr();
+    // Obtiene la dirección del servidor desde configuracion::servidor
+    let direccion_servidor = config::server::obtener_direccion_servidor();
 
     // Inicia el servidor con las rutas definidas
-    warp::serve(routes).run(server_addr).await;
+    warp::serve(rutas).run(direccion_servidor).await;
 }
