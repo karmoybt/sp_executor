@@ -31,7 +31,6 @@ pub fn rutas_autenticacion() -> impl Filter<Extract = impl warp::Reply, Error = 
 // Manejador para la ruta POST /login
 async fn login_comprobar(cuerpo: SolicitudDeInicioDeSesión) -> Result<impl warp::Reply, warp::Rejection> {
     // Verifica las credenciales (esto es solo un ejemplo, ajusta según tu lógica de autenticación)
-    println!("hola");
     if cuerpo.nombre_usuario == "testuser" && cuerpo.contraseña == "testpassword" {
         // Genera el token JWT
         match generar_jwt(&cuerpo.nombre_usuario) {

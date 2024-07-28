@@ -24,7 +24,8 @@ async fn main() {
     let rutas = rutas_bd.or(rutas_sp).or(rutas_autenticacion);
 
     // Obtiene la dirección del servidor desde configuracion::servidor
-    let direccion_servidor = config::server::obtener_direccion_servidor();
+    // let direccion_servidor = config::server::obtener_direccion_servidor();
+    let direccion_servidor = config::server::obtener_direccion_del_servidor();
 
     // Inicia el servidor con las rutas definidas
     warp::serve(rutas).run(direccion_servidor).await;
