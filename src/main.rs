@@ -13,7 +13,7 @@ async fn main() {
     let rb = Arc::new(config::database::inicializar_bd().await);
 
     let rutas_bd = routes::database::ruta_bd(rb.clone());
-    let rutas_sp = routes::stored_procedure::ruta_procedimiento_almacenado(rb.clone());
+    let rutas_sp = routes::stored_procedure::ruta_procedimiento_almacenado(rb.clone()); // Ajustado aquí
     let rutas_autenticacion = routes::auth_routes::rutas_autenticacion();
 
     let rutas = rutas_bd.or(rutas_sp).or(rutas_autenticacion);

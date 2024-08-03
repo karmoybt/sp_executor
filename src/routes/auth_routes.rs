@@ -1,9 +1,9 @@
 use warp::{Filter, Rejection, Reply, reject, http::StatusCode};
 use serde::{Deserialize, Serialize};
 use dotenv::dotenv;
-use std::env;
+//use std::env;
 use warp::http::Method;
-use crate::auth::{generar_jwt, validar_jwt}; // Asegúrate de que estos métodos estén definidos en tu módulo auth
+use crate::auth::{generar_jwt, validar_jwt}; 
 
 // Estructuras para las solicitudes y respuestas JSON
 #[derive(Serialize, Deserialize)]
@@ -25,7 +25,7 @@ struct FallaSession {
 pub fn rutas_autenticacion() -> impl Filter<Extract = (impl Reply,), Error = Rejection> + Clone {
     // Cargar variables de entorno
     dotenv().ok();
-   // let frontend_origin = env::var("FRONT").expect("FRONT environment variable is not set");
+    //let frontend_origin = env::var("FRONT").expect("FRONT environment variable is not set");
 
     let cors = warp::cors()
         //.allow_origin(frontend_origin.as_str()) 

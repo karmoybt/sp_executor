@@ -4,6 +4,8 @@ use jsonwebtoken::{encode, decode, Header, Validation, DecodingKey, EncodingKey}
 use std::env;
 use std::error::Error;
 
+use sha2::{Sha256, Digest};
+
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Reclamaciones {
     pub sub: String,
@@ -36,6 +38,16 @@ pub fn validar_jwt(token: &str) -> Result<Reclamaciones, Box<dyn Error>> {
         .map(|data| data.claims)
         .map_err(|e| Box::new(e) as Box<dyn Error>)
 }
+
+
+
+pub fn hash_password(password: &str, salt: &str) -> String {
+    let mut hasher = Sha256::new();
+    hasher.update(password);
+    hasher.update(salt);
+    format!("{:x}", hasher.finalize())
+}
+
 
 #[cfg(test)]
 mod pruebas {
