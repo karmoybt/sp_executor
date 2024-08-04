@@ -32,14 +32,12 @@ pub fn generar_jwt(nombre_usuario: &str) -> Result<String, String> {
         .map_err(|e| format!("Error al generar JWT: {:?}", e))
 }
 
-pub fn validar_jwt(token: &str) -> Result<Reclamaciones, Box<dyn Error>> {
+pub fn validar_jwt(token: &str) -> Result<Reclamaciones, Box<dyn Error + Send + Sync>> {
     let clave_secreta = env::var("CLAVE_SECRETA").map_err(|_| "CLAVE_SECRETA debe estar configurada")?;
     decode::<Reclamaciones>(&token, &DecodingKey::from_secret(clave_secreta.as_ref()), &Validation::default())
         .map(|data| data.claims)
-        .map_err(|e| Box::new(e) as Box<dyn Error>)
+        .map_err(|e| Box::new(e) as Box<dyn Error + Send + Sync>)
 }
-
-
 
 pub fn hash_password(password: &str, salt: &str) -> String {
     let mut hasher = Sha256::new();
@@ -47,7 +45,6 @@ pub fn hash_password(password: &str, salt: &str) -> String {
     hasher.update(salt);
     format!("{:x}", hasher.finalize())
 }
-
 
 #[cfg(test)]
 mod pruebas {

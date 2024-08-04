@@ -18,9 +18,19 @@ struct RespuestaDeInicioDeSesión {
 }
 
 #[derive(Serialize)]
-struct FallaSession {
+struct JsonRespuetaError {
     error: String,
 }
+
+#[derive(Debug)]
+enum ErrorDeApi {
+    FallaAlGenerarToken,
+    CredencialesInvalidas,
+    TokenInvalido,
+}
+
+impl warp::reject::Reject for ErrorDeApi {} // Implementa Reject para los errores personalizados
+
 
 pub fn rutas_autenticacion() -> impl Filter<Extract = (impl Reply,), Error = Rejection> + Clone {
     // Cargar variables de entorno
@@ -40,7 +50,7 @@ pub fn rutas_autenticacion() -> impl Filter<Extract = (impl Reply,), Error = Rej
         .with(cors.clone());
 
     let ruta_de_validación = warp::path("validar")
-        .and(warp::header::<String>("authorization"))
+        .and(warp::header::<String>("Authorization"))
         .and_then(login_validar)
         .recover(manejar_rechazo)
         .with(cors);
@@ -69,16 +79,6 @@ async fn login_validar(token: String) -> Result<impl warp::Reply, warp::Rejectio
     }
 }
 
-// Definición de errores personalizados para manejar los rechazos de Warp
-#[derive(Debug)]
-enum ErrorDeApi {
-    FallaAlGenerarToken,
-    CredencialesInvalidas,
-    TokenInvalido,
-}
-
-impl warp::reject::Reject for ErrorDeApi {} // Implementa Reject para los errores personalizados
-
 // Función para manejar rechazos y convertirlos en respuestas JSON
 async fn manejar_rechazo(err: Rejection) -> Result<impl warp::Reply, warp::Rejection> {
     if let Some(error) = err.find::<ErrorDeApi>() {
@@ -88,7 +88,7 @@ async fn manejar_rechazo(err: Rejection) -> Result<impl warp::Reply, warp::Rejec
             ErrorDeApi::TokenInvalido => (StatusCode::UNAUTHORIZED, "Invalid token"),
         };
 
-        let json = warp::reply::json(&FallaSession {
+        let json = warp::reply::json(&JsonRespuetaError {
             error: message.to_string(),
         });
 

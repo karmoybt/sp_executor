@@ -1,22 +1,22 @@
-use warp::Filter;
-use std::sync::Arc;
-use rbatis::rbatis::RBatis;
-use crate::models::response::Response;
+// use warp::Filter;
+// use std::sync::Arc;
+// use rbatis::rbatis::RBatis;
+// use crate::models::response::Response;
 
-pub fn ruta_bd(rb: Arc<RBatis>) -> impl Filter<Extract = impl warp::Reply, Error = warp::Rejection> + Clone {
-    warp::path!("Prueba" / "BBDD")
-        .and(warp::get())
-        .and(warp::any().map(move || Arc::clone(&rb)))
-        .map(|_rb: Arc<RBatis>| {
-            let nombre_bd = std::env::var("URL_DE_LA_BASE_DE_DATOS").unwrap().to_string();
-            let respuesta = Response {
-                datos: Vec::new(),
-                estado: "ok".to_string(),
-                mensaje: format!("Conectado a la base de datos: {}", nombre_bd),
-            };
-            warp::reply::json(&respuesta)
-        })
-}
+// pub fn ruta_bd(rb: Arc<RBatis>) -> impl Filter<Extract = impl warp::Reply, Error = warp::Rejection> + Clone {
+//     warp::path!("Prueba" / "BBDD")
+//         .and(warp::get())
+//         .and(warp::any().map(move || Arc::clone(&rb)))
+//         .map(|_rb: Arc<RBatis>| {
+//             let nombre_bd = std::env::var("URL_DE_LA_BASE_DE_DATOS").unwrap().to_string();
+//             let respuesta = Response {
+//                 datos: JsonValue::Null,
+//                 estado: "ok".to_string(),
+//                 mensaje: format!("Conectado a la base de datos: {}", nombre_bd),
+//             };
+//             warp::reply::json(&respuesta)
+//         })
+// }
 
 
 // #[cfg(test)]
