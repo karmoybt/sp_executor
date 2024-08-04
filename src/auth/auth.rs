@@ -39,12 +39,12 @@ pub fn validar_jwt(token: &str) -> Result<Reclamaciones, Box<dyn Error + Send + 
         .map_err(|e| Box::new(e) as Box<dyn Error + Send + Sync>)
 }
 
-pub fn hash_password(password: &str, salt: &str) -> String {
-    let mut hasher = Sha256::new();
-    hasher.update(password);
-    hasher.update(salt);
-    format!("{:x}", hasher.finalize())
-}
+// pub fn hash_password(password: &str, salt: &str) -> String {
+//     let mut hasher = Sha256::new();
+//     hasher.update(password);
+//     hasher.update(salt);
+//     format!("{:x}", hasher.finalize())
+// }
 
 #[cfg(test)]
 mod pruebas {
